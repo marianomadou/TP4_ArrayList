@@ -31,9 +31,9 @@ int main(void)
         startTesting(1); //al_newArrayList
         startTesting(2); //al_add
         startTesting(3); //al_deleteArrayList
-       /* startTesting(4); //al_len
+        startTesting(4); //al_len
         startTesting(5); //al_get
-        startTesting(6); //al_contains
+        /*startTesting(6); //al_contains
         startTesting(7); //al_set
         startTesting(8); //al_remove
         startTesting(9); //al_clear
@@ -52,6 +52,7 @@ int main(void)
 
     return 0;
 }
+
 
 
 
