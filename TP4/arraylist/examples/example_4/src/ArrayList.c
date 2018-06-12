@@ -15,7 +15,7 @@ int contract(ArrayList* this,int index);
 /** \brief Asigne un nuevo arrayList con elementos AL_INITIAL_VALUE.
  * \param void
  * \return ArrayList * Return (NULL) si Error [si no puede asignar memoria]
- * - (puntero a la nueva lista de arreglos) si est√° bien
+ * - (puntero a la nueva lista de arreglos) si est· bien
  */
 ArrayList* al_newArrayList(void)
 {
@@ -63,7 +63,7 @@ ArrayList* al_newArrayList(void)
 
 
 /** \brief  Agregue un elemento a arrayList y si es
- * nessesary cambia el tama√±o de la matriz
+ * nesesario cambia el tamaÒo de la matriz
  * \param pList ArrayList * Puntero a arrayList
  * \param pElement void * Puntero al elemento
  * \return int Return (-1) si Error [pList o pElement son puntero NULL] - (0) si Ok
@@ -72,33 +72,27 @@ ArrayList* al_newArrayList(void)
 int al_add(ArrayList* this, void* pElement)
 {
     int returnAux = -1;
-    void** aux;
     int flag=0;
 
     if(this!=NULL && pElement!=NULL)
     {
-        if(this->size==this->reservedSize)
+        if(this->size == this->reservedSize)
         {
-            aux = (void**)realloc(this->pElements, sizeof(void*)*(this->reservedSize + AL_INCREMENT));
-            if (aux!=NULL)
+            if(resizeUp(this))
             {
-                this->pElements =aux;
-                this->reservedSize=(this->reservedSize + AL_INCREMENT);
+                flag=1;
             }
-                else
-                    {
-                        flag=1;
-                    }
         }
-            if (flag==0)
-            {
-                *(this->pElements+this->size)=pElement;
-                this->size++;
 
-                returnAux=0;
-            }
+        if(flag==0)
+        {
+            *(this->pElements+this->size)=pElement;
+            this->size++;
+            returnAux=0;
+        }
     }
-    return returnAux;
+
+return returnAux;
 }
 
 /** \brief  Eliminar arrayList
@@ -111,13 +105,15 @@ int al_deleteArrayList(ArrayList* this)
     int returnAux = -1;
     if(this != NULL)
     {
-        free(this);
+        free(this->pElements);
+
         returnAux = 0;
     }
     return returnAux;
 }
 
-/** \brief  Eliminar arrayList
+/** \brief  Retorna el tamaÒo del ArrayList. Verificando que el puntero pList sea distinto de NULL.
+ *          Si la  verificaciÛn falla la funciÛn retorna (-1) y si tiene Èxito retorna la longitud del array.
  * \param pList ArrayList * Puntero a arrayList
  * \return int Devuelve la longitud de la matriz o (-1) si Error [pList es un puntero NULL]
  *
@@ -130,15 +126,16 @@ int al_len(ArrayList* this)
     {
       returnAux = this->size;
     }
-
     return returnAux;
 }
 
 
-/** \brief  Obtener un elemento por √≠ndice
+/** \brief  Retorna un puntero al elemento que se encuentra en el Ìndice especificado.
+            Verificando que el puntero pList sea distinto de NULL y que index sea positivo e inferior al tamaÒo del array.
+ *          Si la verificaciÛn falla la funciÛn retorna (NULL) y si tiene Èxito retorna el elemento.
  *\ param pList ArrayList * Puntero a arrayList
- *\ param index int √çndice del elemento
- *\ return void * Return (NULL) si Error [pList es puntero NULL o √≠ndice no v√°lido] - (Puntero al elemento) si Ok
+ *\ param index int Õndice del elemento
+ *\ return void * Return (NULL) si Error [pList es puntero NULL o Ìndice no v·lido] - (Puntero al elemento) si Ok
  *
  */
 void* al_get(ArrayList* this, int index)
@@ -154,68 +151,98 @@ void* al_get(ArrayList* this, int index)
 }
 
 
-/** \brief  Encuentre si pList contiene al menos un elemento pElement
+/** \brief  Comprueba si existe el elemento que se le pasa como par·metro.
+ *          Verificando que tanto el puntero pList como pElement sean distintos de NULL.
+ *          Si la verificaciÛn falla la funciÛn retorna (-1) , si encuentra el elemento (1) y si no lo encuentra (0).
  * \param pList ArrayList * Puntero a arrayList
  * \param pElement void * Puntero al elemento
  * \return int Retorno (-1) si Error [pList o pElement son puntero NULL]
- * - (0) si est√° bien pero no encontr√≥ un elemento
+ * - (0) si est· bien pero no encontrÛ un elemento
  * - (1) si esta lista contiene al menos un elemento pElement
  *
  */
 int al_contains(ArrayList* this, void* pElement)
 {
     int returnAux = -1;
+    int len;
 
-    return returnAux;
+    if (this !=NULL && pElement!=NULL)
+    {
+        returnAux =0;
+        len = al_len(this);
+
+            for(int i=0; i<len; i++)
+            {
+                if(*(this->pElements+i) == pElement)
+                {
+                    returnAux =1;
+                    break;
+                }
+            }
+    }
+return returnAux;
 }
 
-
-/** \brief  Set a element in pList at index position
- * \param pList ArrayList* Pointer to arrayList
- * \param index int Index of the element
- * \param pElement void* Pointer to element
- * \return int Return (-1) if Error [pList or pElement are NULL pointer or invalid index]
- *                  - ( 0) if Ok
- *
- */
- /** \brief Establece un elemento en pList en la posici√≥n de √≠ndice
+ /** \brief Inserta un elemento en el ArrayList, en el Ìndice especificado.
+ *          Verificando que tanto el puntero pList como pElement sean distintos de NULL y que index sea positivo e inferior al tamaÒo del array.
+ *          Si la verificaciÛn falla la funciÛn retorna (-1) y si tiene Èxito (0).
  * \param pList ArrayList * Puntero a arrayList
- * \param index int √çndice del elemento
+ * \param index int Õndice del elemento
  * \param pElement void * Puntero al elemento
- * \return int Retorno (-1) si Error [pList o pElement son puntero NULL o √≠ndice no v√°lido]
- * - (0) si est√° bien
+ * \return int Retorno (-1) si Error [pList o pElement son puntero NULL o Ìndice no v·lido]
+ * - (0) si est· bien
  *
  */
 int al_set(ArrayList* this, int index,void* pElement)
 {
     int returnAux = -1;
 
+    if(this!=NULL && pElement!=NULL)
+    {
+         if(index==(this->size))
+        {
+            al_add(this, pElement);
+        }
+            else if(index<(this->size) && index>=0)
+            {
+                *(this->pElements+index)=pElement;
+                returnAux=0;
+            }
+    }
     return returnAux;
 }
 
-
-/** \brief  Remove an element by index
- * \param pList ArrayList* Pointer to arrayList
- * \param index int Index of the element
- * \return int Return (-1) if Error [pList is NULL pointer or invalid index]
- *                  - ( 0) if Ok
- */
- /** \brief Eliminar un elemento por √≠ndice
+/** \brief Elimina un elemento del ArrayList, en el Ìndice especificado.
+ *         Verificando que el puntero pList sea distinto de NULL y que index sea positivo e inferior al tamaÒo del array.
+ *         Si la verificaciÛn falla la funciÛn retorna (-1) y si tiene Èxito (0).
  * \param pList ArrayList * Puntero a arrayList
- * \param index int √çndice del elemento
- * \return int Retorno (-1) si Error [pList es puntero NULL o √≠ndice no v√°lido]
- * - (0) si est√° bien
+ * \param index int Õndice del elemento
+ * \return int Retorno (-1) si Error [pList es puntero NULL o Ìndice no v·lido]
+ * - (0) si est· bien
  */
 int al_remove(ArrayList* this,int index)
-{
-    int returnAux = -1;
+{//contract
 
+    int returnAux = -1;
+    int auxTam;
+
+    if(this!=NULL && index>=0 && index<(this->size))
+    {
+        auxTam=this->size;
+
+        for(int i=index;i<auxTam;i++)
+        {
+            *(this->pElements+i)=*(this->pElements+(i+1));
+        }
+        returnAux=0;
+        this->size--;
+    }
     return returnAux;
 }
 
 
-
-/** \brief Removes all of the elements from this list
+/** \brief  Borra todos los elementos de ArrayList. Verificando que el puntero pList sea distinto de NULL.
+            Si la verificaciÛn falla la funciÛn retorna (-1) y si tiene Èxito (0).
  * \param pList ArrayList* Pointer to arrayList
  * \return int Return (-1) if Error [pList is NULL pointer]
  *                  - ( 0) if Ok
@@ -224,27 +251,34 @@ int al_clear(ArrayList* this)
 {
     int returnAux = -1;
 
+    if(this!=NULL)
+    {
+        free(this->pElements);
+        this->size=0;
+        returnAux=0;
+    }
+
     return returnAux;
 }
 
-
-
-/** \brief Returns an array containing all of the elements in this list in proper sequence
+/** \brief  Retorna un nuevo ArrayList copia del ArrayList original.
+ *          Verificando que el puntero pList sea distinto de NULL.
+ *          Si la verificaciÛn falla la funciÛn retorna (NULL) y si tiene Èxito retorna el nuevo array.
  * \param pList ArrayList* Pointer to arrayList
  * \return ArrayList* Return  (NULL) if Error [pList is NULL pointer]
  *                          - (New array) if Ok
  */
 ArrayList* al_clone(ArrayList* this)
-{
+{//1)se crea una lista vacia2)-get/add-iterando
     ArrayList* returnAux = NULL;
 
     return returnAux;
 }
 
 
-
-
-/** \brief Inserts the element at the specified position
+/** \brief  Desplaza los elementos e inserta en la posiciÛn index.
+            Verificando que tanto el puntero pList como pElement sean distintos de NULL y que index sea positivo e inferior al tamaÒo del array.
+            Si la verificaciÛn falla la funciÛn retorna (-1) y si tiene Èxito (0).
  * \param pList ArrayList* Pointer to arrayList
  * \param index int Index of the element
  * \param pElement void* Pointer to element
@@ -260,7 +294,9 @@ int al_push(ArrayList* this, int index, void* pElement)
 
 
 
-/** \brief Returns the index of the first occurrence of the specified element
+/** \brief  Retorna el Ìndice de la primera apariciÛn de un elemento (element) en el ArrayList.
+            Verificando que tanto el puntero pList como pElement sean distintos de NULL.
+            Si la verificaciÛn falla o no encuentra el elemento la funciÛn retorna (-1) y si encuentra el elemento retorna su Ìndice.
  * \param pList ArrayList* Pointer to arrayList
  * \param pElement void* Pointer to element
  * \return int Return (-1) if Error [pList or pElement are NULL pointer] - (index to element) if Ok
@@ -274,7 +310,9 @@ int al_indexOf(ArrayList* this, void* pElement)
 
 
 
-/** \brief Returns true if this list contains no elements.
+/** \brief  Retorna cero si contiene elementos y uno si no los tiene.
+            Verificando que el puntero pList sea distinto de NULL.
+            Si la verificaciÛn falla la funciÛn retorna (-1), si esta vacÌo (1) y si contiene elementos (0).
  * \param pList ArrayList* Pointer to arrayList
  * \return int Return (-1) if Error [pList is NULL pointer] - (0) if Not Empty - (1) if is Empty
  */
@@ -288,7 +326,9 @@ int al_isEmpty(ArrayList* this)
 
 
 
-/** \brief Remove the item at the given position in the list, and return it.
+/** \brief  Retorna un puntero al elemento que se encuentra en el Ìndice especificado y luego lo elimina de la lista.
+            Verificando que el puntero pList sea distinto de NULL y que index sea positivo e inferior al tamaÒo del array.
+            Si la verificaciÛn falla la funciÛn retorna (NULL) y si tiene Èxito retorna el elemento.
  * \param pList ArrayList* Pointer to arrayList
  * \param index int Index of the element
  * \return int Return (NULL) if Error [pList is NULL pointer or invalid index]
@@ -317,11 +357,10 @@ ArrayList* al_subList(ArrayList* this,int from,int to)
     return returnAux ;
 }
 
-
-
-
-
-/** \brief Returns true if pList list contains all of the elements of pList2
+/** \brief  Comprueba si los elementos pasados son contenidos por el ArrayList.
+            Verificando que tanto el puntero pList como pList2 sean distintos de NULL.
+            Si la verificaciÛn falla o no encuentra el elemento la funciÛn retorna (-1),
+            si las listas difieren (0) y si ambas listas son iguales retorna (1).
  * \param pList ArrayList* Pointer to arrayList
  * \param pList2 ArrayList* Pointer to arrayList
  * \return int Return (-1) if Error [pList or pList2 are NULL pointer]
@@ -357,7 +396,7 @@ int al_sort(ArrayList* this, int (*pFunc)(void* ,void*), int order)
  /** \brief Incrementa la cantidad de elementos en pList en los elementos AL_INCREMENT.
  * \param pList ArrayList * Puntero a arrayList
  * \return int Retorno (-1) si Error [pList es puntero NULL o no puede asignar memoria]
- * - (0) si est√° bien
+ * - (0) si est· bien
  */
 int resizeUp(ArrayList* this)
 {
@@ -378,18 +417,12 @@ int resizeUp(ArrayList* this)
    return returnAux;
 }
 
-/** \brief  Expand an array list
- * \param pList ArrayList* Pointer to arrayList
- * \param index int Index of the element
- * \return int Return (-1) if Error [pList is NULL pointer or invalid index]
- *                  - ( 0) if Ok
- */
- /** \brief Expandir una lista de array
- * \param pList ArrayList * Puntero a arrayList
- * \param index int √çndice del elemento
- * \return int Retorno (-1) si da Error [pList es puntero NULL o √≠ndice no v√°lido]
- * - (0) si est√° bien
- */
+/** \brief Expandir una lista de array
+* \param pList ArrayList * Puntero a arrayList
+* \param index int Õndice del elemento
+* \return int Retorno (-1) si da Error [pList es puntero NULL o Ìndice no v·lido]
+* - (0) si est· bien
+*/
 int expand(ArrayList* this,int index)
 {
     int returnAux = -1;
@@ -405,9 +438,9 @@ int expand(ArrayList* this,int index)
  */
  /** \brief Contrae una lista de arreglos
  * \param pList ArrayList * Puntero a arrayList
- * \param index int √çndice del elemento
- * \return int Retorno (-1) si Error [pList es puntero NULL o √≠ndice no v√°lido]
- * - (0) si est√° bien
+ * \param index int Õndice del elemento
+ * \return int Retorno (-1) si Error [pList es puntero NULL o Ìndice no v·lido]
+ * - (0) si est· bien
  */
 int contract(ArrayList* this,int index)
 {
