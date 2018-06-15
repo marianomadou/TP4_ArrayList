@@ -106,6 +106,7 @@ int al_deleteArrayList(ArrayList* this)
     if(this != NULL)
     {
         free(this->pElements);
+        free(this);
 
         returnAux = 0;
     }
@@ -269,11 +270,29 @@ int al_clear(ArrayList* this)
  *                          - (New array) if Ok
  */
 ArrayList* al_clone(ArrayList* this)
-{//1)se crea una lista vacia2)-get/add-iterando
-    ArrayList* returnAux = NULL;
+//1)se crea una lista vacia2)add-get/iterando
 
+
+{
+    ArrayList* returnAux = NULL;
+    int i = 0;
+    if(this!= NULL)
+    {
+        returnAux = al_newArrayList();
+
+        if(returnAux != NULL)
+        {
+            for(i = 0; i<=this->size; i++)
+            {
+                al_add(returnAux, al_get(this, i));
+            }
+        }
+    }
     return returnAux;
 }
+
+
+
 
 
 /** \brief  Desplaza los elementos e inserta en la posición index.
@@ -425,8 +444,17 @@ int resizeUp(ArrayList* this)
 */
 int expand(ArrayList* this,int index)
 {
-    int returnAux = -1;
+    int i=0;
+    int returnAux=-1;
 
+    if(this != NULL && (index >= 0 && index <= this->size))
+    {
+        for(i = this->size-1; i >= index; i--)
+        {
+            this->pElements[i+1] = this->pElements[i];
+        }
+        returnAux = 0;
+    }
     return returnAux;
 }
 
