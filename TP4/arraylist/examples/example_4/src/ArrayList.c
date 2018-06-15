@@ -105,8 +105,7 @@ int al_deleteArrayList(ArrayList* this)
     int returnAux = -1;
     if(this != NULL)
     {
-        free(this->pElements);
-        free(this);
+        al_clear(this);
 
         returnAux = 0;
     }
@@ -143,7 +142,7 @@ void* al_get(ArrayList* this, int index)
 {
     void* returnAux = NULL;
 
-    if(this!=NULL && index >= 0 && index <= this->size)
+    if(this!=NULL && index >= 0 && index <= this->len(this))
     {
         returnAux = *(this ->pElements + index);
     }
@@ -165,16 +164,14 @@ void* al_get(ArrayList* this, int index)
 int al_contains(ArrayList* this, void* pElement)
 {
     int returnAux = -1;
-    int len;
 
     if (this !=NULL && pElement!=NULL)
     {
         returnAux =0;
-        len = al_len(this);
 
-            for(int i=0; i<len; i++)
+            for(int i=0; i<al_len(this); i++)
             {
-                if(*(this->pElements+i) == pElement)
+                if(al_get(this,i) == pElement)
                 {
                     returnAux =1;
                     break;
@@ -200,11 +197,11 @@ int al_set(ArrayList* this, int index,void* pElement)
 
     if(this!=NULL && pElement!=NULL)
     {
-         if(index==(this->size))
+         if(index==(al_len(this)))
         {
             al_add(this, pElement);
         }
-            else if(index<(this->size) && index>=0)
+            else if(index<(al_len(this)) && index>=0)
             {
                 *(this->pElements+index)=pElement;
                 returnAux=0;
@@ -222,21 +219,13 @@ int al_set(ArrayList* this, int index,void* pElement)
  * - (0) si está bien
  */
 int al_remove(ArrayList* this,int index)
-{//contract
-
+{
     int returnAux = -1;
-    int auxTam;
 
-    if(this!=NULL && index>=0 && index<(this->size))
+    if(this!=NULL && index>=0 && index<(this->len(this)))
     {
-        auxTam=this->size;
-
-        for(int i=index;i<auxTam;i++)
-        {
-            *(this->pElements+i)=*(this->pElements+(i+1));
-        }
+        contract(this, index);
         returnAux=0;
-        this->size--;
     }
     return returnAux;
 }
@@ -251,12 +240,19 @@ int al_remove(ArrayList* this,int index)
 int al_clear(ArrayList* this)
 {
     int returnAux = -1;
+    void** aux;
 
     if(this!=NULL)
     {
-        free(this->pElements);
         this->size=0;
-        returnAux=0;
+        aux=(void**)realloc(this->pElements, sizeof(void*)*(AL_INCREMENT));
+
+        if(aux != NULL)
+      {
+         this->pElements = aux;
+         this->reservedSize=AL_INCREMENT;
+         returnAux = 0;
+      }
     }
 
     return returnAux;
@@ -272,7 +268,6 @@ int al_clear(ArrayList* this)
 ArrayList* al_clone(ArrayList* this)
 //1)se crea una lista vacia2)add-get/iterando
 
-
 {
     ArrayList* returnAux = NULL;
     int i = 0;
@@ -282,7 +277,7 @@ ArrayList* al_clone(ArrayList* this)
 
         if(returnAux != NULL)
         {
-            for(i = 0; i<=this->size; i++)
+            for(i = 0; i<=this->len(this); i++)
             {
                 al_add(returnAux, al_get(this, i));
             }
@@ -290,9 +285,6 @@ ArrayList* al_clone(ArrayList* this)
     }
     return returnAux;
 }
-
-
-
 
 
 /** \brief  Desplaza los elementos e inserta en la posición index.
@@ -308,9 +300,17 @@ int al_push(ArrayList* this, int index, void* pElement)
 {
     int returnAux = -1;
 
+    if(this!=NULL && pElement!=NULL  && index >=0 && index<=(this->len(this)))
+    {
+        if(!expand(this,index))//expand
+        {
+            al_set(this,index,pElement);
+        }
+            returnAux=0;
+    }
+
     return returnAux;
 }
-
 
 
 /** \brief  Retorna el índice de la primera aparición de un elemento (element) en el ArrayList.
@@ -323,10 +323,24 @@ int al_push(ArrayList* this, int index, void* pElement)
 int al_indexOf(ArrayList* this, void* pElement)
 {
     int returnAux = -1;
+    int tamanio;
 
+    if (this !=NULL && pElement!=NULL )
+    {
+        tamanio = this->len(this);
+
+        for(int i=0; i<tamanio; i++) //break y retorno el indice
+        {
+            if(*(this->pElements+i)== pElement)
+            {
+                returnAux=i;
+                break;
+            }
+        }
+    }
     return returnAux;
-}
 
+}
 
 
 /** \brief  Retorna cero si contiene elementos y uno si no los tiene.
@@ -339,6 +353,17 @@ int al_isEmpty(ArrayList* this)
 {
     int returnAux = -1;
 
+    if(this !=NULL)
+    {
+        if(this->len(this) == 0)
+        {
+            returnAux=1;
+        }
+            else
+            {
+                returnAux=0;
+            }
+    }
     return returnAux;
 }
 
@@ -356,6 +381,12 @@ int al_isEmpty(ArrayList* this)
 void* al_pop(ArrayList* this,int index)
 {
     void* returnAux = NULL;
+
+    if (this !=NULL && index >=0 && index<(this->size))
+    {
+        returnAux = *(this->pElements+index);
+        contract(this,index);
+    }
 
     return returnAux;
 }
@@ -474,5 +505,19 @@ int contract(ArrayList* this,int index)
 {
     int returnAux = -1;
 
+    if(this!=NULL)
+    {
+
+    int auxTam;
+
+    auxTam=this->len(this);
+
+        for(int i=index;i<auxTam;i++)
+        {
+            *(this->pElements+i)=*(this->pElements+(i+1));
+        }
+        returnAux=0;
+        this->size--;
+    }
     return returnAux;
 }
