@@ -434,8 +434,31 @@ return returnAux ;
 int al_containsAll(ArrayList* this,ArrayList* this2)
 {
     int returnAux = -1;
+    int i;
 
-    return returnAux;
+    if(this!=NULL && this2!= NULL)
+    {
+        if(this2->len(this2)==this->len(this))
+        {
+            for(i=0; i<this->len(this); i++)
+            {
+                if(( al_contains(this,al_get(this2,i)))==1)
+                {
+                    returnAux=1;
+                }
+                else
+                {
+                    returnAux=0;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            returnAux= 0;
+        }
+    }
+return returnAux;
 }
 
 /** \brief Sorts objects of list, use compare pFunc
@@ -448,8 +471,46 @@ int al_containsAll(ArrayList* this,ArrayList* this2)
 int al_sort(ArrayList* this, int (*pFunc)(void* ,void*), int order)
 {
     int returnAux = -1;
+    void *aux;
+    int i,j;
+    if(this!=NULL && pFunc!=NULL)
+    {
+        if(order==1)//sort DOWN
+        {
+            for(i=0 ; i<this->size-1 ; i++)
+            {
+                for(j=i+1; j<this->size; j++)
+                {
+                    if((pFunc(al_get(this,i), al_get(this,j)))==1)
+                    {
+                        aux=al_get(this,i);
+                        al_set(this,i,al_get(this,j));
+                        al_set(this,j,aux);
+                    }
+                }
+            }
+            returnAux=0;
+        }
+        if(order==0)//sort UP
+        {
+             for(i=0 ; i<this->size-1 ; i++)
+            {
+                for(j=i+1; j<this->size; j++)
+                {
+                    if((pFunc(al_get(this,i), al_get(this,j)))==-1)
+                    {
+                        aux=al_get(this,i);
+                        al_set(this,i,al_get(this,j));
+                        al_set(this,j,aux);
+                    }
+                }
+            }
+            returnAux=0;
+        }
+    }
 
-    return returnAux;
+   return returnAux;
+
 }
 
 
@@ -522,7 +583,6 @@ int contract(ArrayList* this,int index)
 
     if(this!=NULL)
     {
-
     int auxTam;
 
     auxTam=this->len(this);
