@@ -382,7 +382,7 @@ void* al_pop(ArrayList* this,int index)
 {
     void* returnAux = NULL;
 
-    if (this !=NULL && index >=0 && index<(this->size))
+    if (this !=NULL && index >=0 && index<(this->len(this)))
     {
         returnAux = *(this->pElements+index);
         contract(this,index);
@@ -403,8 +403,23 @@ void* al_pop(ArrayList* this,int index)
 ArrayList* al_subList(ArrayList* this,int from,int to)
 {
     void* returnAux = NULL;
+    void *pElementAux;
+    int i;
 
-    return returnAux ;
+    if(this!=NULL && from>=0 && from<=(this->len(this)) &&  to>= 0 && to<=(this->len(this)) && from < to)
+    {
+        returnAux=al_newArrayList();
+
+        if(returnAux!=NULL)
+        {
+            for(i=from; i<to; i++)
+            {
+                pElementAux=al_get(this,i);
+                al_add(returnAux,pElementAux);
+            }
+        }
+    }
+return returnAux ;
 }
 
 /** \brief  Comprueba si los elementos pasados son contenidos por el ArrayList.
